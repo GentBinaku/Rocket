@@ -39,16 +39,18 @@ ref-cast = "1.0"
 uncased = "0.9.6"
 either = "1"
 pear = "0.2.3"
-webpki = { version = "0.22", optional = true }
+webpki = { version = "0.22.0", optional = false }
+
 pin-project-lite = "0.2"
 memchr = "2"
 stable-pattern = "0.1"
 cookie = { version = "0.17.0", features = ["percent-encode"] }
 state = "0.5.3"
 futures = { version = "0.3", default-features = false }
+webpki-roots = { version = "0.22.6", optional = true }
 
 [dependencies.x509-parser]
-version = "0.13"
+version = "0.13.2"
 optional = true
 
 [dependencies.hyper]

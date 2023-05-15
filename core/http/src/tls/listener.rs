@@ -7,7 +7,6 @@ use std::task::{Context, Poll};
 use rustls::internal::msgs::base::PayloadU8;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::{TcpListener, TcpStream};
-use tokio_rustls::webpki::{DnsName, DnsNameRef};
 use rustls::sign::CertifiedKey;
 use rustls::server::ClientHello;
 use tokio_rustls::{server::TlsStream as BareTlsStream, Accept, TlsAcceptor};
@@ -22,6 +21,8 @@ pub struct TlsListener {
     listener: TcpListener,
     acceptor: TlsAcceptor,
 }
+pub struct Resolver;
+
 /// This implementation exists so that ROCKET_WORKERS=1 can make progress while
 /// a TLS handshake is being completed. It does this by returning `Ready` from
 /// `poll_accept()` as soon as we have a TCP connection and performing the
@@ -75,10 +76,20 @@ pub struct Config<R> {
     pub mandatory_mtls: bool,
 }
 
+impl rustls::server::ResolvesServerCert for Resolver{
+      // Required method
+    fn resolve(
+        &self,
+        client_hello: ClientHello<'_>
+    ) -> Option<Arc<CertifiedKey>>{
+        None
+    }
+} 
+
 impl TlsListener {
 
     /// Create a new TLS listener over TCP bound to the given address.
-    pub async fn bind<R>(&self, addr: SocketAddr, mut c: Config<R>) -> io::Result<TlsListener>
+    pub async fn bind<R>(addr: SocketAddr, mut c: Config<R>) -> io::Result<TlsListener>
     where
         R: io::BufRead,
     {
@@ -104,8 +115,8 @@ impl TlsListener {
             Box::leak(s.into_boxed_str())
         } 
 
-        let dns_ref = DnsNameRef::try_from_ascii_str("www.rust-lang.org").unwrap();
-        let dns_name = DnsName::try_from(dns_ref); 
+        let dns_ref = webpki::DnsNameRef::try_from_ascii_str("www.rust-lang.org").unwrap();
+        let dns_name = webpki::DnsName::try_from(dns_ref); 
         let signature_scheme = rustls::SignatureScheme::RSA_PKCS1_SHA256;
         let alpn_protocols: Vec<PayloadU8>;
         let cipher_suites = rustls::CipherSuite::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384;
@@ -117,7 +128,7 @@ impl TlsListener {
             .with_safe_default_protocol_versions()
             .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("bad TLS config: {}", e)))?
             .with_client_cert_verifier(client_auth)
-            .with_cert_resolver();
+            .with_cert_resolver(Arc::new(Resolver));
 
 
         tls_config.ignore_client_order = c.prefer_server_order;
