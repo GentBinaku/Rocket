@@ -1,23 +1,27 @@
+use std::future::Future;
 use std::io;
+use std::net::SocketAddr;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
-use std::future::Future;
-use std::net::SocketAddr;
-
-use tokio::net::{TcpListener, TcpStream};
+use rustls::internal::msgs::base::PayloadU8;
 use tokio::io::{AsyncRead, AsyncWrite};
-use tokio_rustls::{Accept, TlsAcceptor, server::TlsStream as BareTlsStream};
+use tokio::net::{TcpListener, TcpStream};
+use tokio_rustls::webpki::{DnsName, DnsNameRef};
+use rustls::sign::CertifiedKey;
+use rustls::server::ClientHello;
+use tokio_rustls::{server::TlsStream as BareTlsStream, Accept, TlsAcceptor};
+use crate::listener::{Certificates, Connection, Listener};
+use crate::tls::util::{load_ca_certs, load_certs, load_private_key};
 
-use crate::tls::util::{load_certs, load_private_key, load_ca_certs};
-use crate::listener::{Connection, Listener, Certificates};
+
+
 
 /// A TLS listener over TCP.
 pub struct TlsListener {
     listener: TcpListener,
     acceptor: TlsAcceptor,
 }
-
 /// This implementation exists so that ROCKET_WORKERS=1 can make progress while
 /// a TLS handshake is being completed. It does this by returning `Ready` from
 /// `poll_accept()` as soon as we have a TCP connection and performing the
@@ -72,11 +76,14 @@ pub struct Config<R> {
 }
 
 impl TlsListener {
-    pub async fn bind<R>(addr: SocketAddr, mut c: Config<R>) -> io::Result<TlsListener>
-        where R: io::BufRead
+
+    /// Create a new TLS listener over TCP bound to the given address.
+    pub async fn bind<R>(&self, addr: SocketAddr, mut c: Config<R>) -> io::Result<TlsListener>
+    where
+        R: io::BufRead,
     {
-        use rustls::server::{AllowAnyAuthenticatedClient, AllowAnyAnonymousOrAuthenticatedClient};
-        use rustls::server::{NoClientAuth, ServerSessionMemoryCache, ServerConfig};
+        use rustls::server::{AllowAnyAnonymousOrAuthenticatedClient, AllowAnyAuthenticatedClient};
+        use rustls::server::{NoClientAuth, ServerConfig, ServerSessionMemoryCache};
 
         let cert_chain = load_certs(&mut c.cert_chain)
             .map_err(|e| io::Error::new(e.kind(), format!("bad TLS cert chain: {}", e)))?;
@@ -93,14 +100,25 @@ impl TlsListener {
             None => NoClientAuth::boxed(),
         };
 
+        fn string_to_static_str(s: String) -> &'static str {
+            Box::leak(s.into_boxed_str())
+        } 
+
+        let dns_ref = DnsNameRef::try_from_ascii_str("www.rust-lang.org").unwrap();
+        let dns_name = DnsName::try_from(dns_ref); 
+        let signature_scheme = rustls::SignatureScheme::RSA_PKCS1_SHA256;
+        let alpn_protocols: Vec<PayloadU8>;
+        let cipher_suites = rustls::CipherSuite::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384;
+
+        
         let mut tls_config = ServerConfig::builder()
             .with_cipher_suites(&c.ciphersuites)
             .with_safe_default_kx_groups()
             .with_safe_default_protocol_versions()
             .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("bad TLS config: {}", e)))?
             .with_client_cert_verifier(client_auth)
-            .with_single_cert(cert_chain, key)
-            .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("bad TLS config: {}", e)))?;
+            .with_cert_resolver();
+
 
         tls_config.ignore_client_order = c.prefer_server_order;
 
@@ -110,12 +128,19 @@ impl TlsListener {
         }
 
         tls_config.session_storage = ServerSessionMemoryCache::new(1024);
-        tls_config.ticketer = rustls::Ticketer::new()
-            .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("bad TLS ticketer: {}", e)))?;
+        tls_config.ticketer = rustls::Ticketer::new().map_err(|e| {
+            io::Error::new(io::ErrorKind::Other, format!("bad TLS ticketer: {}", e))
+        })?;
 
         let listener = TcpListener::bind(addr).await?;
         let acceptor = TlsAcceptor::from(Arc::new(tls_config));
         Ok(TlsListener { listener, acceptor })
+    }
+}
+ 
+impl rustls::server::ResolvesServerCert for TlsListener{
+    fn resolve(&self, client_hello: ClientHello<'_>) -> Option<Arc<CertifiedKey>> {
+        None
     }
 }
 
@@ -128,7 +153,7 @@ impl Listener for TlsListener {
 
     fn poll_accept(
         self: Pin<&mut Self>,
-        cx: &mut Context<'_>
+        cx: &mut Context<'_>,
     ) -> Poll<io::Result<Self::Connection>> {
         match futures::ready!(self.listener.poll_accept(cx)) {
             Ok((io, addr)) => Poll::Ready(Ok(TlsStream {
@@ -157,7 +182,7 @@ impl Connection for TlsStream {
                 None => Ok(()),
                 Some(s) => s.enable_nodelay(),
             },
-            TlsState::Streaming(stream) => stream.get_ref().0.enable_nodelay()
+            TlsState::Streaming(stream) => stream.get_ref().0.enable_nodelay(),
         }
     }
 
@@ -170,9 +195,10 @@ impl TlsStream {
     fn poll_accept_then<F, T>(
         mut self: Pin<&mut Self>,
         cx: &mut Context<'_>,
-        mut f: F
+        mut f: F,
     ) -> Poll<io::Result<T>>
-        where F: FnMut(&mut BareTlsStream<TcpStream>, &mut Context<'_>) -> Poll<io::Result<T>>
+    where
+        F: FnMut(&mut BareTlsStream<TcpStream>, &mut Context<'_>) -> Poll<io::Result<T>>,
     {
         loop {
             match self.state {
@@ -190,7 +216,7 @@ impl TlsStream {
                             return Poll::Ready(Err(e));
                         }
                     }
-                },
+                }
                 TlsState::Streaming(ref mut stream) => return f(stream, cx),
             }
         }
@@ -221,7 +247,7 @@ impl AsyncWrite for TlsStream {
             TlsState::Handshaking(accept) => match accept.get_mut() {
                 Some(io) => Pin::new(io).poll_flush(cx),
                 None => Poll::Ready(Ok(())),
-            }
+            },
             TlsState::Streaming(stream) => Pin::new(stream).poll_flush(cx),
         }
     }
@@ -231,7 +257,7 @@ impl AsyncWrite for TlsStream {
             TlsState::Handshaking(accept) => match accept.get_mut() {
                 Some(io) => Pin::new(io).poll_shutdown(cx),
                 None => Poll::Ready(Ok(())),
-            }
+            },
             TlsState::Streaming(stream) => Pin::new(stream).poll_shutdown(cx),
         }
     }
