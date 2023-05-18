@@ -4,10 +4,14 @@ use std::net::SocketAddr;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
-use rustls::internal::msgs::base::PayloadU8;
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio::net::{TcpListener, TcpStream};
-use rustls::sign::CertifiedKey;
+use rustls::server::ResolvesServerCert;
+use rustls::sign::{CertifiedKey, SigningKey, Signer};
+use rustls::PrivateKey;
+use rustls::SignatureScheme;
+use rustls::SignatureAlgorithm;
+use rustls::Certificate;
 use rustls::server::ClientHello;
 use tokio_rustls::{server::TlsStream as BareTlsStream, Accept, TlsAcceptor};
 use crate::listener::{Certificates, Connection, Listener};
@@ -21,8 +25,9 @@ pub struct TlsListener {
     listener: TcpListener,
     acceptor: TlsAcceptor,
 }
-pub struct Resolver;
-
+pub struct Resolver { 
+    cert: Vec<Certificate>
+}
 /// This implementation exists so that ROCKET_WORKERS=1 can make progress while
 /// a TLS handshake is being completed. It does this by returning `Ready` from
 /// `poll_accept()` as soon as we have a TCP connection and performing the
@@ -75,17 +80,15 @@ pub struct Config<R> {
     pub ca_certs: Option<R>,
     pub mandatory_mtls: bool,
 }
-
-impl rustls::server::ResolvesServerCert for Resolver{
+impl ResolvesServerCert for Resolver{
       // Required method
     fn resolve(
         &self,
-        client_hello: ClientHello<'_>
+        client_hello: ClientHello<'_>,
     ) -> Option<Arc<CertifiedKey>>{
         None
     }
-} 
-
+}
 impl TlsListener {
 
     /// Create a new TLS listener over TCP bound to the given address.
@@ -103,7 +106,7 @@ impl TlsListener {
             .map_err(|e| io::Error::new(e.kind(), format!("bad TLS private key: {}", e)))?;
 
         let client_auth = match c.ca_certs {
-            Some(ref mut ca_certs) => match load_ca_certs(ca_certs) {
+                Some(ref mut ca_certs) => match load_ca_certs(ca_certs) {
                 Ok(ca) if c.mandatory_mtls => AllowAnyAuthenticatedClient::new(ca).boxed(),
                 Ok(ca) => AllowAnyAnonymousOrAuthenticatedClient::new(ca).boxed(),
                 Err(e) => return Err(io::Error::new(e.kind(), format!("bad CA cert(s): {}", e))),
@@ -111,24 +114,13 @@ impl TlsListener {
             None => NoClientAuth::boxed(),
         };
 
-        fn string_to_static_str(s: String) -> &'static str {
-            Box::leak(s.into_boxed_str())
-        } 
-
-        let dns_ref = webpki::DnsNameRef::try_from_ascii_str("www.rust-lang.org").unwrap();
-        let dns_name = webpki::DnsName::try_from(dns_ref); 
-        let signature_scheme = rustls::SignatureScheme::RSA_PKCS1_SHA256;
-        let alpn_protocols: Vec<PayloadU8>;
-        let cipher_suites = rustls::CipherSuite::TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384;
-
-        
         let mut tls_config = ServerConfig::builder()
             .with_cipher_suites(&c.ciphersuites)
             .with_safe_default_kx_groups()
             .with_safe_default_protocol_versions()
             .map_err(|e| io::Error::new(io::ErrorKind::Other, format!("bad TLS config: {}", e)))?
             .with_client_cert_verifier(client_auth)
-            .with_cert_resolver(Arc::new(Resolver));
+            .with_cert_resolver(Arc::new(Resolver{cert: cert_chain.clone()}));
 
 
         tls_config.ignore_client_order = c.prefer_server_order;
@@ -149,12 +141,6 @@ impl TlsListener {
     }
 }
  
-impl rustls::server::ResolvesServerCert for TlsListener{
-    fn resolve(&self, client_hello: ClientHello<'_>) -> Option<Arc<CertifiedKey>> {
-        None
-    }
-}
-
 impl Listener for TlsListener {
     type Connection = TlsStream;
 
