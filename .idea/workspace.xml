@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d19fb581-6f76-4a86-91f8-16a5e0e5c811" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp256_sha256.p12" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp256_sha256.p12" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp256_sha256_cert.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp256_sha256_cert.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp256_sha256_key_pkcs8.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp256_sha256_key_pkcs8.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp384_sha384.p12" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp384_sha384.p12" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp384_sha384_cert.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp384_sha384_cert.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp384_sha384_key_pkcs8.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ecdsa_nistp384_sha384_key_pkcs8.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ed25519.p12" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ed25519.p12" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ed25519_cert.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ed25519_cert.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/ed25519_key.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/ed25519_key.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/rsa_sha256.p12" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/rsa_sha256.p12" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/rsa_sha256_cert.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/rsa_sha256_cert.pem" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/examples/tls/private/rsa_sha256_key.pem" beforeDir="false" afterPath="$PROJECT_DIR$/examples/tls/private/rsa_sha256_key.pem" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">
+    <option name="selectedUrlAndAccountId">
+      <UrlAndAccount>
+        <option name="accountId" value="df6b4cb1-7c78-4e9b-a136-631df19dab56" />
+        <option name="url" value="git@github.com:GentBinaku/Rocket.git" />
+      </UrlAndAccount>
+    </option>
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/../.cargo/registry/src/index.crates.io-6f17d22bba15001f/tokio-1.34.0/src/runtime/park.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/alloc/src/string.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ptr/const_ptr.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ptr/metadata.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/ptr/mod.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/slice/raw.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/str/mod.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/../.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/library/core/src/str/traits.rs" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="om36fdi3" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2YuHpD1MmhNvqL6BOIqRC8ZQEPQ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Debug tls.executor": "Debug",
+    "Cargo.Run.executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "/home/gentb/Rocket",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "settings.editor.selected.configurable": "language.rust.cargo.check",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RsExternalLinterProjectSettings">
+    <option name="runOnTheFly" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration name="Debug tls" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="run" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$/examples/tls" />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="true" />
+      <option name="withSudo" value="true" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="FULL" />
+      <envs />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$PROJECT_DIR$/../.cargo/bin" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d19fb581-6f76-4a86-91f8-16a5e0e5c811" name="Changes" comment="" />
+      <created>1701368724627</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1701368724627</updated>
+      <workItem from="1701368725636" duration="32000" />
+      <workItem from="1701368762455" duration="631000" />
+      <workItem from="1701371695185" duration="123000" />
+      <workItem from="1701371823479" duration="46000" />
+      <workItem from="1701371873641" duration="13000" />
+      <workItem from="1701371892128" duration="192000" />
+      <workItem from="1701372110205" duration="237000" />
+      <workItem from="1701372354321" duration="11000" />
+      <workItem from="1701372371034" duration="821000" />
+      <workItem from="1701373198760" duration="3725000" />
+      <workItem from="1701474864098" duration="2626000" />
+      <workItem from="1701477924572" duration="745000" />
+      <workItem from="1701480820222" duration="1245000" />
+      <workItem from="1701487971395" duration="7000" />
+      <workItem from="1701492917249" duration="692000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/core/http/src/tls/listener.rs</url>
+          <line>80</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

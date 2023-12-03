@@ -1,14 +1,17 @@
 use std::io;
+use std::sync::Mutex;
 use std::pin::Pin;
 use std::sync::Arc;
 use std::task::{Context, Poll};
 use std::future::Future;
 use std::net::SocketAddr;
 
+use rustls::sign::CertifiedKey;
 use tokio::net::{TcpListener, TcpStream};
 use tokio::io::{AsyncRead, AsyncWrite};
 use tokio_rustls::{Accept, TlsAcceptor, server::TlsStream as BareTlsStream};
-
+use crate::tls::rustls::server::{ResolvesServerCert, ClientHello};
+use crate::tls::rustls::{PrivateKey, Certificate};
 use crate::tls::util::{load_certs, load_private_key, load_ca_certs};
 use crate::listener::{Connection, Listener, Certificates};
 
@@ -16,6 +19,16 @@ use crate::listener::{Connection, Listener, Certificates};
 pub struct TlsListener {
     listener: TcpListener,
     acceptor: TlsAcceptor,
+}
+
+
+pub struct ResolverConfig {
+    pub cert_chain: Vec<Certificate>,
+    pub private_key: PrivateKey,
+}
+#[derive(Clone)]
+pub struct ResolverCert {
+    pub config: Arc<Mutex<ResolverConfig>>,
 }
 
 /// This implementation exists so that ROCKET_WORKERS=1 can make progress while
@@ -59,6 +72,20 @@ pub enum TlsState {
     Handshaking(Accept<TcpStream>),
     /// TLS handshake completed successfully; we're getting payload data.
     Streaming(BareTlsStream<TcpStream>),
+} 
+
+
+impl ResolvesServerCert for ResolverCert {
+    fn resolve(&self, _client_hello: ClientHello) -> Option<Arc<CertifiedKey>> {
+        
+        let config = self.config.lock().unwrap();
+
+        let cert_chain = &config.cert_chain;
+        let private_key = &config.private_key;
+        let sign_key =  rustls::sign::any_supported_type(&private_key).unwrap();
+        let cert = Arc::new(CertifiedKey::new(cert_chain.to_vec(), sign_key));
+        Some(cert)
+}
 }
 
 /// TLS as ~configured by `TlsConfig` in `rocket` core.
